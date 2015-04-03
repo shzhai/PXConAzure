@@ -40,9 +40,9 @@
         [parameter(Mandatory=$false)]
         [String]$DiskSizeinGB = "32",
         [parameter(Mandatory=$false)] # Default Data disk size 
-        [String]$VMExtLocation = "https://github.com/shzhai/PXConAzure/blob/master/DeployPXC/azurepxc.sh", 
+        [String]$VMExtLocation = "https://raw.githubusercontent.com/shzhai/PXConAzure/master/DeployPXC/azurepxc.sh", 
         [parameter(Mandatory=$false)]
-        [String]$MyCnfLocation = "https://github.com/shzhai/PXConAzure/blob/master/DeployPXC/my.cnf.template" # This is a default Percona db config file, you can change with your own and place your URL here
+        [String]$MyCnfLocation = "https://raw.githubusercontent.com/shzhai/PXConAzure/master/DeployPXC/my.cnf.template" # This is a default Percona db config file, you can change with your own and place your URL here
         )
 
 
