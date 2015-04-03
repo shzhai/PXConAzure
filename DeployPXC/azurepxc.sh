@@ -295,12 +295,12 @@ configure_mysql() {
         echo "FLUSH PRIVILEGES;" >> /tmp/bootstrap-pxc.sql
         mysql < /tmp/bootstrap-pxc.sql
     fi
-    lbchk=`netstat -nlt | grep -i 9200` 
-    if [ -z "$lbchk" ] ;  
-    then 
-        service xinetd restart 
-    fi 
-    chmod o+x /var/lib/mysql 
+    lbchk=`netstat -nlt | grep -i 9200`
+    if [ -z "$lbchk" ] ; 
+    then
+        service xinetd restart
+    fi
+    chmod o+x /var/lib/mysql
 }
 
 allow_passwordssh() {
@@ -311,12 +311,6 @@ allow_passwordssh() {
 	fi
     sed -i "s/^#PasswordAuthentication.*/PasswordAuthentication yes/I" /etc/ssh/sshd_config
     sed -i "s/^PasswordAuthentication no.*/PasswordAuthentication yes/I" /etc/ssh/sshd_config
-	/etc/init.d/sshd reload
-}
-
-	wget "${KEY}" -O /home/"${AZUSER}"/.ssh/id_rsa
-	chown "${AZUSER}" /home/"${AZUSER}"/.ssh/id_rsa
-	chmod 700 /home/"${AZUSER}"/.ssh/id_rsa
 	/etc/init.d/sshd reload
 }
 
