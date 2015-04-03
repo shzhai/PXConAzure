@@ -40,9 +40,9 @@
         [parameter(Mandatory=$false)]
         [String]$DiskSizeinGB = "32",
         [parameter(Mandatory=$false)] # Default Data disk size 
-        [String]$VMExtLocation = "https://raw.githubusercontent.com/shzhai/Azure/master/DeployPXC/azurepxc.sh", 
+        [String]$VMExtLocation = "https://github.com/shzhai/PXConAzure/blob/master/DeployPXC/azurepxc.sh", 
         [parameter(Mandatory=$false)]
-        [String]$MyCnfLocation = "https://raw.githubusercontent.com/shzhai/Azure/master/DeployPXC/my.cnf.template" # This is a default Percona db config file, you can change with your own and place your URL here
+        [String]$MyCnfLocation = "https://github.com/shzhai/PXConAzure/blob/master/DeployPXC/my.cnf.template" # This is a default Percona db config file, you can change with your own and place your URL here
         )
 
 
@@ -138,10 +138,24 @@ $DiskSizeinGB,
 $ExistingVMPorts
 )
 {
-    $LoadBalancerName = $NodePrefix + 'iLB'    $LoadBalancerSetName = $NodePrefix + 'iLBSet'    $AvailabilitySetName =$NodePrefix + "HAset"    $ExtraVMIPs = $null    $Nodes = $DBNodeIPs.split(",")    $ExtensionName="CustomScriptForLinux"
+    $LoadBalancerName = $NodePrefix + 'iLB'
+    $LoadBalancerSetName = $NodePrefix + 'iLBSet'
+    $AvailabilitySetName =$NodePrefix + "HAset"
+    $ExtraVMIPs = $null
+    $Nodes = $DBNodeIPs.split(",")
+    $ExtensionName="CustomScriptForLinux"
     $ExtensionPublisher="Microsoft.OSTCExtensions"
-    $ExtensionVersion="1.*"    $MySQLPort=3306
-    $MySQLProbePort=9200    $ilbConfig = New-AzureInternalLoadBalancerConfig -InternalLoadBalancerName $LoadBalancerName -StaticVNetIPAddress $LoadBalancerIP -SubnetName $DBSubnet        if (($ExtraNICName) -and ($ExtraNICName -ne ""))    {        $ExtraVMIPs = $ExtraNICIPs.Split(",")    }    for ($i=0; $i -lt $Nodes.count;$i++)
+    $ExtensionVersion="1.*"
+    $MySQLPort=3306
+    $MySQLProbePort=9200
+    $ilbConfig = New-AzureInternalLoadBalancerConfig -InternalLoadBalancerName $LoadBalancerName -StaticVNetIPAddress $LoadBalancerIP -SubnetName $DBSubnet    
+    if (($ExtraNICName) -and ($ExtraNICName -ne ""))
+    {
+        $ExtraVMIPs = $ExtraNICIPs.Split(",")
+    }
+
+
+    for ($i=0; $i -lt $Nodes.count;$i++)
     {
         $VMName = $NodePrefix + ($i + 1)
         $VMIP = $Nodes[$i].Trim(' ')
@@ -221,7 +235,9 @@ $ExistingVMPorts
 
 
 
-Select-AzureSubscription -SubscriptionName $SubscriptionNameSet-AzureSubscription -SubscriptionName $SubscriptionName -CurrentStorageAccountName $StorageAccountName
+
+Select-AzureSubscription -SubscriptionName $SubscriptionName
+Set-AzureSubscription -SubscriptionName $SubscriptionName -CurrentStorageAccountName $StorageAccountName
 $AzureVersion = (Get-Module -ListAvailable -Name Azure).Version
 $ExistingVMPorts = Get-AzureVM | Get-AzureEndpoint | Select-Object -ExpandProperty Port
 
@@ -234,7 +250,12 @@ if (!(Get-AzureLocation | Where-Object {$_.DisplayName -eq $Location}))
 }
 $StorageAccount = Get-AzureStorageAccount -StorageAccountName $StorageAccountName
 $StorageLocation = $StorageAccount.Location
-$Imagename = (Select-UptodateAzureVMImage -LinuxOS -Image $LinuxImage -ErrorAction SilentlyContinue).ImageNameif (!($Imagename)) {    Write-Error ("Linux image {0} doesn't exist, can't process!" -f $LinuxImage)    break}
+$Imagename = (Select-UptodateAzureVMImage -LinuxOS -Image $LinuxImage -ErrorAction SilentlyContinue).ImageName
+if (!($Imagename)) 
+{
+    Write-Error ("Linux image {0} doesn't exist, can't process!" -f $LinuxImage)
+    break
+}
 if (($LinuxPassword -ne "") -and ($CertToDeploy -ne "")) {
     Write-Error ("Can't provide ceritificate and linux password at the same time! Choose either way only")
     break
@@ -336,7 +357,8 @@ if ($?)
         $Thumbprint = $Certificate[0].Thumbprint
         $sshkey = New-AzureSSHKey -PublicKey -Fingerprint $Thumbprint -Path $KeyPath
     }
-     New-PerconaCluster -Servicename $Servicename -Imagename $Imagename -SSHKey $sshkey `
+     
+New-PerconaCluster -Servicename $Servicename -Imagename $Imagename -SSHKey $sshkey `
 -Instancesize $InstanceSize -NodePrefix $NodePrefix -LinuxUser $LinuxUser -LinuxPassword $LinuxPassword `
 -DBSubnet $DBSubnet -DBNodeIPs $DBNodeIPs -LoadBalancerIP $LoadBalancerIP `
 -ExtraNICName $ExtraNICName -ExtraNICSubnet $ExtraNICSubnet -ExtraNICIPs $ExtraNICIPs `
