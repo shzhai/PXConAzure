@@ -248,7 +248,7 @@
                 "blobURI": ".blob.core.chinacloudapi.cn"
             }
         },
-        "currentEnvironmentSettings": "variables('environmentSettings').[parameters('AzureEnvironment')]]",
+        "currentEnvironmentSettings": "[variables('environmentSettings')[parameters('AzureEnvironment')]]",
         "currentblobURI": "[variables('currentEnvironmentSettings').blobURI]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "dbSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('dbSubnetName'))]",
