@@ -241,7 +241,7 @@
     },
     "variables": {
         "environmentSettings": {
-            "MoonCake": {
+            "Mooncake": {
                 "blobURI": ".blob.core.windows.net"
             },
             "Global": {
